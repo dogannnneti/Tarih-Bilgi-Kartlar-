@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarih Pro - Hızlı Çalışma</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb; --success: #10b981; --danger: #ef4444;
+      --dark: #111827; --light: #f3f4f6; --warning: #f59e0b;
+    }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--light); display: flex; height: 100vh; overflow: hidden; }
+    
+    /* Login */
+    #loginOverlay { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .login-box { background: white; padding: 30px; border-radius: 16px; width: 320px; text-align: center; }
+    .login-box input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #d1d5db; box-sizing: border-box; }
+
+    /* Sidebar */
+    .sidebar { width: 240px; background: var(--dark); color: #e5e7eb; padding: 20px; display: flex; flex-direction: column; flex-shrink: 0; }
+    .menu button { width: 100%; margin-bottom: 10px; padding: 12px; background: transparent; border: 1px solid #374151; border-radius: 8px; color: #9ca3af; font-weight: 600; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+    .menu button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    /* Ana Panel */
+    .main { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; }
+    .panel { width: 100%; max-width: 850px; background: #fff; padding: 25px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+    /* Kategori ve Hızlı Seçim Düzeni */
+    .cat-list-item { display: flex; align-items: center; gap: 12px; padding: 10px; margin: 5px 0; background: #fff; border-radius: 8px; border: 1px solid #e5e7eb; cursor: pointer; }
+    .cat-check { width: 18px; height: 18px; cursor: pointer; margin: 0; }
+    
+    .quick-options { display: flex; gap: 10px; margin-bottom: 20px; }
+    .opt-btn { flex: 1; padding: 10px; border: 2px solid #e5e7eb; border-radius: 10px; background: white; cursor: pointer; font-weight: bold; color: #666; transition: 0.2s; }
+    .opt-btn.active { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
+
+    /* Kart Tasarımı */
+    .card-area { display: flex; justify-content: center; margin: 25px 0; perspective: 1000px; }
+    .card { width: 450px; height: 280px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
+    .card.flipped { transform: rotateY(180deg); }
+    .face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px; border: 2px solid #e5e7eb; box-sizing: border-box; display: flex; flex-direction: column; padding: 25px; background: white; align-items: center; justify-content: center; text-align: center; }
+    .back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; justify-content: flex-start; overflow-y: auto; text-align: left; }
+    
+    .card-title { font-size: 22px; font-weight: 800; color: var(--dark); }
+    .card-year { font-size: 16px; font-weight: 600; color: var(--primary); margin-top: 10px; background: #eff6ff; padding: 3px 12px; border-radius: 12px; }
+    .back ul { margin: 10px 0; padding-left: 20px; font-size: 15px; line-height: 1.5; }
+
+    .btn { padding: 12px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .hidden { display: none !important; }
+    input, textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+
+<div id="loginOverlay">
+  <div class="login-box">
+    <h3><i class="fas fa-lock"></i> Tarih Pro Giriş</h3>
+    <input type="email" id="loginEmail" placeholder="E-posta">
+    <input type="password" id="loginPass" placeholder="Şifre">
+    <button class="btn" style="background:var(--primary); width:100%" onclick="handleLogin()">Giriş Yap</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <h2>Tarih Pro Cloud</h2>
+  <div class="menu">
+    <button id="btnAdd" class="active" onclick="showPage('add')"><i class="fas fa-edit"></i> Yönetim</button>
+    <button id="btnStudy" onclick="showPage('study')"><i class="fas fa-book-reader"></i> Çalışma</button>
+    <button onclick="handleLogout()" style="margin-top:auto; background:var(--danger); color:white;"><i class="fas fa-sign-out-alt"></i> Çıkış</button>
+  </div>
+</div>
+
+<div class="main">
+  <div id="pageAdd" class="panel">
+    <h3 style="margin-top:0">Veri Yönetimi</h3>
+    <input type="hidden" id="editKey" value="">
+    <div style="display:flex; gap:10px;">
+      <input id="title" placeholder="Başlık" style="flex:3">
+      <input id="year" type="number" placeholder="Yıl" style="flex:1">
+    </div>
+    <textarea id="info" placeholder="Bilgiler (Alt alta yazın)" style="height:100px;"></textarea>
+    <input id="category" placeholder="Kategori">
+    <button id="mainBtn" class="btn" style="background:var(--primary); width:100%" onclick="saveCard()">Buluta Kaydet</button>
+    <table>
+      <thead><tr><th>Yıl</th><th>Başlık</th><th>Kategori</th><th style="text-align:right">İşlem</th></tr></thead>
+      <tbody id="cardTable"></tbody>
+    </table>
+  </div>
+
+  <div id="pageStudy" class="panel hidden">
+    <div id="setupArea">
+      <h4 style="margin-top:0">Kart Sayısı</h4>
+      <div class="quick-options">
+        <button class="opt-btn active" onclick="setLimit(0, this)">Tümü</button>
+        <button class="opt-btn" onclick="setLimit(10, this)">10 Kart</button>
+        <button class="opt-btn" onclick="setLimit(20, this)">20 Kart</button>
+      </div>
+
+      <h4 style="margin-top:0">Konular</h4>
+      <div id="catCheckboxes" style="border:1px solid #ddd; padding:10px; border-radius:12px; max-height:250px; overflow-y:auto; background:#f9f9f9; margin-bottom:15px;"></div>
+      <button class="btn" style="background:var(--primary); width:100%;" onclick="startStudy()">Çalışmayı Başlat</button>
+    </div>
+
+    <div id="studyArea" class="hidden">
+      <div id="progressInfo" style="text-align:center; margin-bottom:10px; font-weight:bold; color:var(--primary);"></div>
+      <div class="card-area">
+        <div class="card" id="studyCard" onclick="this.classList.toggle('flipped')">
+          <div class="face front">
+            <div id="qTitle" class="card-title"></div>
+            <div id="qYear" class="card-year"></div>
+            <small style="color:#aaa; margin-top:20px;">Çevirmek için tıkla</small>
+          </div>
+          <div class="face back" id="qInfo"></div>
+        </div>
+      </div>
+      <div style="display:flex; gap:15px;">
+        <button class="btn" style="background:var(--danger); flex:1" onclick="answer(false)">Bilemedim</button>
+        <button class="btn" style="background:var(--success); flex:1" onclick="answer(true)">Bildim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+  import { getDatabase, ref, push, onValue, set, remove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDSaFzavCGs6fc0_fYUURRoyVICcYYPdrM",
+    authDomain: "tarih-bilgi-kartlari.firebaseapp.com",
+    databaseURL: "https://tarih-bilgi-kartlari-default-rtdb.firebaseio.com",
+    projectId: "tarih-bilgi-kartlari",
+    storageBucket: "tarih-bilgi-kartlari.firebasestorage.app",
+    messagingSenderId: "81975755776",
+    appId: "1:81975755776:web:e4fe1d147ded535e2a04e5",
+    measurementId: "G-J682F2HK1N"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getDatabase(app);
+
+  let allCards = [];
+  let queue = [];
+  let totalSession = 0;
+  let cardLimit = 0; // 0 = Hepsi
+
+  window.handleLogin = () => {
+    const e = document.getElementById('loginEmail').value;
+    const p = document.getElementById('loginPass').value;
+    signInWithEmailAndPassword(auth, e, p).catch(() => alert("Giriş Hatalı!"));
+  };
+
+  window.handleLogout = () => signOut(auth).then(() => location.reload());
+
+  onAuthStateChanged(auth, (user) => {
+    if(user) {
+      document.getElementById('loginOverlay').classList.add('hidden');
+      listenData();
+    } else {
+      document.getElementById('loginOverlay').classList.remove('hidden');
+    }
+  });
+
+  function listenData() {
+    onValue(ref(db, "kartlar"), (snap) => {
+      const data = snap.val();
+      allCards = data ? Object.entries(data).map(([id, v]) => ({ ...v, id })) : [];
+      render();
+    });
+  }
+
+  window.setLimit = (num, btn) => {
+    cardLimit = num;
+    document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+
+  window.saveCard = () => {
+    const title = document.getElementById('title').value;
+    const year = document.getElementById('year').value;
+    const info = document.getElementById('info').value;
+    const category = document.getElementById('category').value;
+    const key = document.getElementById('editKey').value;
+
+    if(!title || !info) return alert("Boş alan bırakmayın!");
+    const d = { title, year, info, category: category || "Genel" };
+
+    if(key) set(ref(db, `kartlar/${key}`), d);
+    else push(ref(db, "kartlar"), d);
+    clearForm();
+  };
+
+  window.deleteCard = (id) => confirm("Silinsin mi?") && remove(ref(db, `kartlar/${id}`));
+
+  window.editCard = (id) => {
+    const c = allCards.find(x => x.id === id);
+    document.getElementById('title').value = c.title;
+    document.getElementById('year').value = c.year;
+    document.getElementById('info').value = c.info;
+    document.getElementById('category').value = c.category;
+    document.getElementById('editKey').value = c.id;
+    document.getElementById('mainBtn').innerText = "Güncelle";
+    showPage('add');
+  };
+
+  function clearForm() {
+    document.getElementById('editKey').value = "";
+    document.getElementById('title').value = ""; document.getElementById('info').value = "";
+    document.getElementById('year').value = ""; document.getElementById('category').value = "";
+    document.getElementById('mainBtn').innerText = "Buluta Kaydet";
+  }
+
+  function render() {
+    document.getElementById('cardTable').innerHTML = allCards.sort((a,b)=>a.year-b.year).map(c => `
+      <tr><td>${c.year}</td><td>${c.title}</td><td>${c.category}</td><td style="text-align:right">
+        <i class="fas fa-edit" style="color:var(--warning); cursor:pointer; margin-right:15px" onclick="editCard('${c.id}')"></i>
+        <i class="fas fa-trash" style="color:var(--danger); cursor:pointer" onclick="deleteCard('${c.id}')"></i>
+      </td></tr>`).join('');
+    
+    const cats = [...new Set(allCards.map(c => c.category))].sort();
+    document.getElementById('catCheckboxes').innerHTML = cats.map(c => `
+      <label class="cat-list-item">
+        <input type="checkbox" class="cat-check" value="${c}" checked>
+        <span class="cat-text">${c}</span>
+      </label>
+    `).join('');
+  }
+
+  window.showPage = (p) => {
+    document.getElementById('pageAdd').classList.toggle('hidden', p !== 'add');
+    document.getElementById('pageStudy').classList.toggle('hidden', p !== 'study');
+    document.getElementById('btnAdd').classList.toggle('active', p === 'add');
+    document.getElementById('btnStudy').classList.toggle('active', p === 'study');
+    if(p === 'study') {
+        document.getElementById('setupArea').classList.remove('hidden');
+        document.getElementById('studyArea').classList.add('hidden');
+    }
+  };
+
+  window.startStudy = () => {
+    const selected = Array.from(document.querySelectorAll('.cat-check:checked')).map(b => b.value);
+    if(selected.length === 0) return alert("Konu seçin!");
+    
+    let filtered = allCards.filter(c => selected.includes(c.category)).sort(() => Math.random() - 0.5);
+    
+    if(cardLimit > 0) {
+        filtered = filtered.slice(0, cardLimit);
+    }
+
+    queue = filtered;
+    totalSession = queue.length;
+    document.getElementById('setupArea').classList.add('hidden');
+    document.getElementById('studyArea').classList.remove('hidden');
+    draw();
+  };
+
+  function draw() {
+    if(queue.length === 0) { alert("Çalışma bitti!"); return showPage('study'); }
+    const c = queue[0];
+    document.getElementById('progressInfo').innerText = `Kalan: ${queue.length} / ${totalSession}`;
+    document.getElementById('studyCard').classList.remove('flipped');
+    setTimeout(() => {
+      document.getElementById('qTitle').innerText = c.title;
+      document.getElementById('qYear').innerText = c.year || "";
+      document.getElementById('qInfo').innerHTML = `<ul>${c.info.split('\n').map(l => `<li>${l}</li>`).join('')}</ul>`;
+    }, 150);
+  }
+
+  window.answer = (ok) => {
+    const c = queue.shift();
+    if(!ok) queue.push(c);
+    draw();
+  };
+</script>
+</body>
+</html>
