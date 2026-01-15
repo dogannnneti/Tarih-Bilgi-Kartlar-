@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tarih Pro - Mobil Uyumlu</title>
+  <title>Tarih Pro - Final</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,78 +13,68 @@
   <style>
     :root {
       --primary: #2563eb; --success: #10b981; --danger: #ef4444;
-      --dark: #111827; --light: #f3f4f6; --warning: #f59e0b;
+      --dark: #111827; --light: #f3f4f6; --text: #1f2937;
     }
     
-    body { 
-      margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--light); 
-      display: flex; height: 100vh; flex-direction: row; overflow: hidden; 
-    }
+    body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--light); display: flex; height: 100vh; flex-direction: column; overflow: hidden; }
 
     /* Giriş Ekranı */
     #loginOverlay { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 9999; }
     .login-box { background: white; padding: 30px; border-radius: 16px; width: 320px; text-align: center; }
     .login-box input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #d1d5db; box-sizing: border-box; }
 
-    /* Masaüstü Sidebar */
+    /* Alt Navigasyon */
     .sidebar { 
-      width: 240px; background: var(--dark); color: #e5e7eb; padding: 20px; 
-      display: flex; flex-direction: column; flex-shrink: 0; z-index: 100;
+      position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; 
+      background: var(--dark); border-top: 1px solid #333; z-index: 1000;
+      display: flex; justify-content: space-around; align-items: center;
     }
-    .sidebar h2 { font-size: 20px; margin-bottom: 20px; color: white; }
+    .menu { display: flex; width: 100%; justify-content: space-around; }
     .menu button { 
-      width: 100%; margin-bottom: 10px; padding: 12px; background: transparent; 
-      border: 1px solid #374151; border-radius: 8px; color: #9ca3af; 
-      font-weight: 600; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 10px; 
+      background: transparent; border: none; color: #9ca3af; font-weight: 600; 
+      display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 11px; cursor: pointer;
     }
-    .menu button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .menu button.active { color: var(--primary); }
+    .menu button i { font-size: 20px; }
 
-    /* Ana İçerik Alanı */
-    .main { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-bottom: 100px; }
-    .panel { width: 100%; max-width: 600px; background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    /* Ana Alan */
+    .main { flex: 1; padding: 15px; overflow-y: auto; padding-bottom: 100px; display: flex; flex-direction: column; align-items: center; }
+    .panel { width: 100%; max-width: 500px; }
 
-    /* Kart Tasarımı */
+    /* Kategori Listesi - GÖRÜNMEYEN METİN DÜZELTMESİ */
+    .cat-list-item { 
+      display: flex; align-items: center; gap: 15px; padding: 15px; 
+      margin: 10px 0; background: #ffffff; border-radius: 12px; 
+      border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .cat-text { 
+      font-size: 16px; font-weight: 600; 
+      color: #111827 !important; /* Metni zorla koyu yap */
+      display: inline-block;
+    }
+    .cat-check { width: 22px; height: 22px; cursor: pointer; }
+
+    /* Kartlar */
     .card-area { display: flex; justify-content: center; margin: 15px 0; perspective: 1000px; width: 100%; }
-    .card { width: 100%; height: 350px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
+    .card { width: 100%; height: 380px; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform 0.6s; }
     .card.flipped { transform: rotateY(180deg); }
     .face { 
       position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
-      border-radius: 20px; border: 2px solid #e5e7eb; box-sizing: border-box; 
+      border-radius: 24px; border: 2px solid #e5e7eb; box-sizing: border-box; 
       display: flex; flex-direction: column; padding: 25px; background: white; 
       align-items: center; justify-content: center; text-align: center; 
     }
-    .back { transform: rotateY(180deg); background: #f8fafc; align-items: flex-start; justify-content: flex-start; overflow-y: auto; text-align: left; }
-    .card-title { font-size: 24px; font-weight: 800; color: var(--dark); }
-    .card-year { font-size: 18px; font-weight: 700; color: var(--primary); margin-top: 10px; background: #eff6ff; padding: 5px 15px; border-radius: 12px; }
-    .back ul { padding-left: 20px; font-size: 16px; line-height: 1.6; color: #374151; }
+    .back { transform: rotateY(180deg); background: #f9fafb; align-items: flex-start; justify-content: flex-start; overflow-y: auto; text-align: left; }
+    .card-title { font-size: 24px; font-weight: 800; color: var(--dark); line-height: 1.2; }
+    .card-year { font-size: 18px; font-weight: 700; color: var(--primary); margin-top: 12px; background: #eff6ff; padding: 5px 15px; border-radius: 12px; }
+    .back ul { padding-left: 20px; font-size: 16px; line-height: 1.6; color: #374151; margin-top: 10px; }
 
-    /* MOBİL ÖZEL DÜZENLEME (ALT BAR) */
-    @media (max-width: 768px) {
-      body { flex-direction: column; }
-      .sidebar { 
-        position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; 
-        flex-direction: row; padding: 0; background: var(--dark); border-top: 1px solid #333;
-      }
-      .sidebar h2 { display: none; }
-      .menu { 
-        display: flex; flex-direction: row; width: 100%; height: 100%; 
-        justify-content: space-around; align-items: center; 
-      }
-      .menu button { 
-        border: none; margin-bottom: 0; flex-direction: column; gap: 4px; 
-        font-size: 11px; padding: 10px; align-items: center; width: auto; text-align: center;
-      }
-      .menu button i { font-size: 20px; }
-      .main { padding: 10px; padding-bottom: 90px; }
-      .panel { border-radius: 0; box-shadow: none; background: transparent; padding: 10px; }
-      .card { height: 400px; }
-    }
-
-    /* Ortak yardımcı sınıflar */
+    /* Butonlar */
+    .btn { padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; color: white; font-size: 16px; width: 100%; }
+    .btn-outline { background: #fff; color: #666; border: 1px solid #ddd; }
     .hidden { display: none !important; }
-    .btn { padding: 15px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px; }
-    input, textarea { width: 100%; padding: 14px; border: 1px solid #d1d5db; border-radius: 10px; box-sizing: border-box; margin-bottom: 12px; font-size: 16px; }
-    .cat-list-item { display: flex; align-items: center; gap: 12px; padding: 12px; margin: 8px 0; background: white; border-radius: 10px; border: 1px solid #e5e7eb; }
+    input, textarea { width: 100%; padding: 14px; border: 1px solid #d1d5db; border-radius: 10px; margin-bottom: 12px; font-size: 16px; }
+
   </style>
 </head>
 <body>
@@ -94,51 +84,44 @@
     <h3>Tarih Pro Giriş</h3>
     <input type="email" id="loginEmail" placeholder="E-posta">
     <input type="password" id="loginPass" placeholder="Şifre">
-    <button class="btn" style="background:var(--primary); width:100%" onclick="handleLogin()">Giriş Yap</button>
+    <button class="btn" style="background:var(--primary)" onclick="handleLogin()">Giriş Yap</button>
   </div>
 </div>
 
 <div class="sidebar">
-  <h2>Tarih Pro</h2>
   <div class="menu">
-    <button id="btnStudy" class="active" onclick="showPage('study')">
-      <i class="fas fa-book-open"></i> <span>Çalışma</span>
-    </button>
-    <button id="btnAdd" onclick="showPage('add')">
-      <i class="fas fa-plus-circle"></i> <span>Yönetim</span>
-    </button>
-    <button onclick="handleLogout()" style="color: var(--danger);">
-      <i class="fas fa-sign-out-alt"></i> <span>Çıkış</span>
-    </button>
+    <button id="btnStudy" class="active" onclick="showPage('study')"><i class="fas fa-book-open"></i><span>Çalışma</span></button>
+    <button id="btnAdd" onclick="showPage('add')"><i class="fas fa-plus-circle"></i><span>Yönetim</span></button>
+    <button onclick="handleLogout()" style="color:var(--danger)"><i class="fas fa-sign-out-alt"></i><span>Çıkış</span></button>
   </div>
 </div>
 
 <div class="main">
   <div id="pageStudy" class="panel">
     <div id="setupArea">
-      <h3 style="margin-top:0">Çalışma Ayarları</h3>
-      <div style="display:flex; gap:10px; margin-bottom:20px;">
-        <button class="btn" style="background:#eee; color:#333; flex:1; font-size:14px;" onclick="setLimit(10, this)">10 Kart</button>
-        <button class="btn" style="background:#eee; color:#333; flex:1; font-size:14px;" onclick="setLimit(20, this)">20 Kart</button>
-        <button class="btn" style="background:var(--primary); flex:1; font-size:14px;" onclick="setLimit(0, this)">Tümü</button>
+      <h3 style="text-align:center">Çalışma Ayarları</h3>
+      <div style="display:flex; gap:8px; margin-bottom:15px;">
+        <button class="btn btn-outline" id="l10" onclick="setLimit(10, this)">10 Kart</button>
+        <button class="btn btn-outline" id="l20" onclick="setLimit(20, this)">20 Kart</button>
+        <button class="btn" style="background:var(--primary); flex:1" id="l0" onclick="setLimit(0, this)">Tümü</button>
       </div>
-      <div id="catCheckboxes" style="max-height:300px; overflow-y:auto; margin-bottom:20px;"></div>
-      <button class="btn" style="background:var(--success); width:100%" onclick="startStudy()">BAŞLAT</button>
+      <div id="catCheckboxes"></div>
+      <button class="btn" style="background:var(--success); margin-top:15px;" onclick="startStudy()">BAŞLAT</button>
     </div>
 
     <div id="studyArea" class="hidden">
-      <div id="progressInfo" style="text-align:center; font-weight:bold; color:var(--primary); margin-bottom:10px;"></div>
+      <div id="progressInfo" style="text-align:center; font-weight:bold; color:var(--primary);"></div>
       <div class="card-area">
         <div class="card" id="studyCard" onclick="this.classList.toggle('flipped')">
           <div class="face front">
             <div id="qTitle" class="card-title"></div>
             <div id="qYear" class="card-year"></div>
-            <p style="color:#999; margin-top:30px; font-size:14px;">Çevirmek için karta dokun</p>
+            <p style="color:#999; margin-top:25px; font-size:13px;">Çevirmek için dokun</p>
           </div>
           <div class="face back" id="qInfo"></div>
         </div>
       </div>
-      <div style="display:flex; gap:15px; margin-top:20px;">
+      <div style="display:flex; gap:12px; margin-top:10px;">
         <button class="btn" style="background:var(--danger); flex:1" onclick="answer(false)">BİLEMEDİM</button>
         <button class="btn" style="background:var(--success); flex:1" onclick="answer(true)">BİLDİM</button>
       </div>
@@ -146,12 +129,12 @@
   </div>
 
   <div id="pageAdd" class="panel hidden">
-    <h3 style="margin-top:0">Yeni Kart Ekle</h3>
-    <input id="title" placeholder="Başlık (Örn: Ferhat Paşa Ant.)">
+    <h3>Veri Yönetimi</h3>
+    <input id="title" placeholder="Başlık">
     <input id="year" type="number" placeholder="Yıl">
-    <textarea id="info" placeholder="Bilgiler (Her maddeyi alt alta yazın)" style="height:100px;"></textarea>
+    <textarea id="info" placeholder="Bilgiler (Alt alta)" style="height:80px;"></textarea>
     <input id="category" placeholder="Kategori">
-    <button class="btn" style="background:var(--primary); width:100%" onclick="saveCard()">Buluta Gönder</button>
+    <button class="btn" style="background:var(--primary)" onclick="saveCard()">Kaydet</button>
     <div id="cardList" style="margin-top:20px;"></div>
   </div>
 </div>
@@ -175,21 +158,18 @@
   const auth = getAuth(app);
   const db = getDatabase(app);
 
-  let allCards = [];
-  let queue = [];
-  let limit = 0;
+  let allCards = [], queue = [], limit = 0;
 
   onAuthStateChanged(auth, user => {
-    if(user) { document.getElementById('loginOverlay').style.display='none'; listen(); }
-    else { document.getElementById('loginOverlay').style.display='flex'; }
+    if(user) { document.getElementById('loginOverlay').classList.add('hidden'); listen(); }
+    else { document.getElementById('loginOverlay').classList.remove('hidden'); }
   });
 
   window.handleLogin = () => {
     const e = document.getElementById('loginEmail').value;
     const p = document.getElementById('loginPass').value;
-    signInWithEmailAndPassword(auth, e, p).catch(err => alert("Giriş başarısız!"));
+    signInWithEmailAndPassword(auth, e, p).catch(() => alert("Hata!"));
   };
-
   window.handleLogout = () => signOut(auth);
 
   function listen() {
@@ -200,34 +180,19 @@
     });
   }
 
-  window.saveCard = () => {
-    const title = document.getElementById('title').value;
-    const year = document.getElementById('year').value;
-    const info = document.getElementById('info').value;
-    const category = document.getElementById('category').value;
-    if(!title || !info) return alert("Eksik alan var!");
-    push(ref(db, "kartlar"), { title, year, info, category: category || "Genel" });
-    document.getElementById('title').value = ""; document.getElementById('info').value = "";
-  };
-
-  window.showPage = (p) => {
-    document.getElementById('pageAdd').classList.toggle('hidden', p !== 'add');
-    document.getElementById('pageStudy').classList.toggle('hidden', p !== 'study');
-    document.getElementById('btnAdd').classList.toggle('active', p === 'add');
-    document.getElementById('btnStudy').classList.toggle('active', p === 'study');
-  };
-
   window.setLimit = (n, btn) => {
     limit = n;
-    btn.parentElement.querySelectorAll('button').forEach(b => b.style.background = '#eee');
-    btn.style.background = 'var(--primary)'; btn.style.color = 'white';
+    btn.parentElement.querySelectorAll('button').forEach(b => {
+       b.classList.add('btn-outline'); b.style.background='#fff'; b.style.color='#666';
+    });
+    btn.classList.remove('btn-outline'); btn.style.background='var(--primary)'; btn.style.color='white';
   };
 
   window.startStudy = () => {
     const selectedCats = Array.from(document.querySelectorAll('.cat-check:checked')).map(i => i.value);
     let filtered = allCards.filter(c => selectedCats.includes(c.category)).sort(() => Math.random() - 0.5);
     if(limit > 0) filtered = filtered.slice(0, limit);
-    if(filtered.length === 0) return alert("Kart bulunamadı!");
+    if(filtered.length === 0) return alert("Kart seçin!");
     queue = filtered;
     document.getElementById('setupArea').classList.add('hidden');
     document.getElementById('studyArea').classList.remove('hidden');
@@ -236,13 +201,13 @@
 
   function draw() {
     if(queue.length === 0) { 
-      alert("Tebrikler, bitti!"); 
+      alert("Bitti!"); 
       document.getElementById('setupArea').classList.remove('hidden');
       document.getElementById('studyArea').classList.add('hidden');
       return;
     }
     const c = queue[0];
-    document.getElementById('progressInfo').innerText = `Kalan: ${queue.length}`;
+    document.getElementById('progressInfo').innerText = `Kalan Kart: ${queue.length}`;
     document.getElementById('studyCard').classList.remove('flipped');
     setTimeout(() => {
       document.getElementById('qTitle').innerText = c.title;
@@ -258,13 +223,32 @@
   };
 
   function render() {
-    const cats = [...new Set(allCards.map(c => c.category))];
+    const cats = [...new Set(allCards.map(c => c.category))].sort();
     document.getElementById('catCheckboxes').innerHTML = cats.map(c => `
       <label class="cat-list-item">
-        <input type="checkbox" class="cat-check" value="${c}" checked> <span>${c}</span>
+        <input type="checkbox" class="cat-check" value="${c}" checked>
+        <span class="cat-text">${c}</span>
       </label>
     `).join('');
   }
+
+  window.showPage = (p) => {
+    document.getElementById('pageAdd').classList.toggle('hidden', p !== 'add');
+    document.getElementById('pageStudy').classList.toggle('hidden', p !== 'study');
+    document.getElementById('btnAdd').classList.toggle('active', p === 'add');
+    document.getElementById('btnStudy').classList.toggle('active', p === 'study');
+  };
+
+  window.saveCard = () => {
+    const title = document.getElementById('title').value;
+    const year = document.getElementById('year').value;
+    const info = document.getElementById('info').value;
+    const category = document.getElementById('category').value;
+    if(title && info) {
+      push(ref(db, "kartlar"), { title, year, info, category: category || "Genel" });
+      document.getElementById('title').value = ""; document.getElementById('info').value = "";
+    }
+  };
 </script>
 </body>
 </html>
